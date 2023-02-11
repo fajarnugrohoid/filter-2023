@@ -22,11 +22,20 @@ func NewSchoolOptionService(seniorSchoolOptionRepo SeniorSchoolOptionRepository,
 	return &SchoolOptionService{seniorSchoolOptionRepo, vocationalSchoolOptionRepo}
 }
 
+/*
 func (service SchoolOptionService) GetSchoolOptionByLevelAndOpt(ctx context.Context, level string) map[string][]*domain.PpdbOption {
 	//TODO implement me
 	var schoolOption map[string][]*domain.PpdbOption
 	schoolOption["abk"] = service.getSchoolOptionByLevelAndOptType(ctx, level, "abk")
 	schoolOption["ketm"] = service.getSchoolOptionByLevelAndOptType(ctx, level, "ketm")
+
+	return schoolOption
+} */
+
+func (service SchoolOptionService) GetSchoolOptionByLevelAndOpt(ctx context.Context, level string, optionType string) []*domain.PpdbOption {
+	//TODO implement me
+	var schoolOption []*domain.PpdbOption
+	schoolOption = service.getSchoolOptionByLevelAndOptType(ctx, level, optionType)
 
 	return schoolOption
 }

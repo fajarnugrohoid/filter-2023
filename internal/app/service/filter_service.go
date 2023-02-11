@@ -7,7 +7,8 @@ import (
 )
 
 type SchoolOptionService interface {
-	GetSchoolOptionByLevelAndOpt(ctx context.Context, level string) map[string][]*domain.PpdbOption
+	//GetSchoolOptionByLevelAndOpt(ctx context.Context, level string) map[string][]*domain.PpdbOption
+	GetSchoolOptionByLevelAndOpt(ctx context.Context, level string, optType string) []*domain.PpdbOption
 }
 type RegistrationService interface {
 	InitStudent(group *sync.WaitGroup, mutex sync.Mutex, messages chan *domain.PpdbOption, ctx context.Context, schoolByOpt []*domain.PpdbOption, level string, opt *domain.PpdbOption)
@@ -24,11 +25,13 @@ func NewFilterService(schoolOptionService SchoolOptionService, registrationServi
 
 func (fs FilterService) InitSchoolOption(ctx context.Context, optionTypes []*domain.PpdbOption, schoolOption []*domain.PpdbOption, level string, optType string) []*domain.PpdbOption {
 
-	schoolOption = fs.schoolOptionService.GetSchoolOptionByLevelAndOpt(ctx, level)
+	var schoolOptionByType map[string][]*domain.PpdbOption
+	schoolOptionByType[optType] = fs.schoolOptionService.GetSchoolOptionByLevelAndOpt(ctx, level, optType)
+
 	group := &sync.WaitGroup{}
 	var mutex sync.Mutex
 
-	for _, opt := range schoolOption {
+	for _, opt := range schoolOptionByType[optType] {
 
 		//fmt.Println("opt.id:", opt.Id, "-", opt.Name)
 		/*
