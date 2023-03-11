@@ -8,9 +8,11 @@ import (
 
 type SeniorSchoolOptionRepository interface {
 	GetSeniorSchoolOptionByOptType(ctx context.Context, level string, optType string) []*domain.PpdbOption
+	GetSeniorSchoolOptionTemporary(ctx context.Context, level string, optType string) []*domain.PpdbOption
 }
 type VocationalSchoolOptionRepository interface {
 	GetVocationalSchoolOptionByOptType(ctx context.Context, level string, optType string) []*domain.PpdbOption
+	GetVocationalSchoolOptionTemporary(ctx context.Context, level string, optType string) []*domain.PpdbOption
 }
 
 type SchoolOptionService struct {
@@ -36,6 +38,14 @@ func (service SchoolOptionService) GetSchoolOptionByLevelAndOpt(ctx context.Cont
 	//TODO implement me
 	var schoolOption []*domain.PpdbOption
 	schoolOption = service.getSchoolOptionByLevelAndOptType(ctx, level, optionType)
+
+	return schoolOption
+}
+
+func (service SchoolOptionService) GetSchoolOptionTemporaryByLevel(ctx context.Context, level string, optionType string) []*domain.PpdbOption {
+	//TODO implement me
+	var schoolOption []*domain.PpdbOption
+	schoolOption = service.getSchoolOptionTemporaryCheckLevel(ctx, level, optionType)
 
 	return schoolOption
 }
@@ -105,6 +115,20 @@ func (service SchoolOptionService) getSchoolOptionByLevelAndOptType(ctx context.
 		ppdbSchoolOptions = service.seniorSchoolOptionRepo.GetSeniorSchoolOptionByOptType(ctx, level, optType)
 	} else {
 		ppdbSchoolOptions = service.vocationalSchoolOptionRepo.GetVocationalSchoolOptionByOptType(ctx, level, optType)
+	}
+
+	fmt.Println("ppdbSchoolOptions ", optType, ":", len(ppdbSchoolOptions))
+	return ppdbSchoolOptions
+}
+
+func (service SchoolOptionService) getSchoolOptionTemporaryCheckLevel(ctx context.Context, level string, optType string) []*domain.PpdbOption {
+	//TODO implement me
+
+	var ppdbSchoolOptions []*domain.PpdbOption
+	if level == "senior" {
+		ppdbSchoolOptions = service.seniorSchoolOptionRepo.GetSeniorSchoolOptionTemporary(ctx, level, optType)
+	} else {
+		ppdbSchoolOptions = service.vocationalSchoolOptionRepo.GetVocationalSchoolOptionTemporary(ctx, level, optType)
 	}
 
 	fmt.Println("ppdbSchoolOptions ", optType, ":", len(ppdbSchoolOptions))

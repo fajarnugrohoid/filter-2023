@@ -2,9 +2,10 @@ package detail
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"new-filterization/internal/app/model/domain"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type RegistrationRepository interface {

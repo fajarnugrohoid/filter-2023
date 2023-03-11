@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
+	"new-filterization/internal/app/model/domain"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"new-filterization/internal/app/model/domain"
 )
 
 type SeniorSchoolOptionRepository struct {
@@ -57,6 +58,64 @@ func (sr SeniorSchoolOptionRepository) GetSeniorSchoolOptionByOptType(ctx contex
 			objectId20, objectId21,
 			objectId22, objectId23, objectId24, objectId25,
 		} */
+
+	matchStage := bson.D{{"$match", bson.M{
+		"type": optType,
+		/*
+			"$and": []bson.M{bson.M{
+				"school_id": bson.M{"$in": schoolIds},
+			}}, */
+		/*
+			"$and": []bson.M{bson.M{
+				"name": primitive.Regex{Pattern: "TANJUNGSARI", Options: ""},
+			}}, */
+	}}}
+	//groupStage := bson.M{{"$group", bson.M{{"_id", "$podcast"}, {"total", bson.M{{"$sum", "$duration"}}}}}}
+
+	pipeline := []bson.M{
+		bson.M{"$match": bson.M{
+			"$expr": bson.M{
+				"$and": []bson.M{
+					{"$eq": []string{"$_id", "$$school_id"}},
+					{"$eq": []string{"$level", level}},
+					//	{"$eq": []string{"$type", "negeri"}},
+				},
+			},
+		}},
+	}
+	lookupStage := bson.D{{"$lookup", bson.D{{"from", "ppdb_schools"},
+		{"let", bson.D{{"school_id", "$school_id"}}},
+		{"pipeline", pipeline},
+		{"as", "ppdb_schools"}}}}
+	unwindStage := bson.D{{"$unwind", "$ppdb_schools"}}
+	sortByName := bson.D{{"$sort", bson.D{{"name", 1}}}}
+	sortByType := bson.D{{"$sort", bson.D{{"type", 1}}}}
+	//allowDisk := bson.D{{"allow", true}}
+	//fields := bson.D{{"$project", bson.D{{"name", 1}}}}
+
+	showInfoCursor, err := registrationsCollection.Aggregate(ctx, mongo.Pipeline{
+		matchStage, lookupStage, unwindStage, sortByName, sortByType,
+	}, options.Aggregate().SetAllowDiskUse(true))
+
+	if err != nil {
+		panic(err)
+	}
+
+	//var showsWithInfo []bson.M
+	var showsWithInfo []*domain.PpdbOption
+
+	if err = showInfoCursor.All(ctx, &showsWithInfo); err != nil {
+		panic(err)
+	}
+
+	defer showInfoCursor.Close(ctx)
+	return showsWithInfo
+}
+
+func (sr SeniorSchoolOptionRepository) GetSeniorSchoolOptionTemporary(ctx context.Context, level string, optType string) []*domain.PpdbOption {
+	//TODO implement me
+
+	registrationsCollection := sr.db.Collection("ppdb_options")
 
 	matchStage := bson.D{{"$match", bson.M{
 		"type": optType,

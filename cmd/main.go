@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"new-filterization/internal/app/database"
 	"new-filterization/internal/app/handler"
@@ -11,6 +10,8 @@ import (
 	"new-filterization/internal/app/service/detail"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
